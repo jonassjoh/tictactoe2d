@@ -30,6 +30,7 @@ public class Player {
 
 		for (GameState state : nextStates) {
 			int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer());
+			//int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, opponent(gameState.getNextPlayer()));
 
 			if (bestAlpha < alpha) {
 				bestAlpha = alpha;
@@ -83,7 +84,7 @@ public class Player {
 		if (player_A) {
 			v = Integer.MIN_VALUE;
 			for (GameState child : mu(state)) {
-				v = max(v, alphabeta(child, depth-1, alpha, beta, Constants.CELL_O));
+				v = max(v, alphabeta(child, depth-1, alpha, beta, opponent(player)));
 				alpha = max(alpha, v);
 				if (beta <= alpha)
 					break; // beta prune
@@ -92,7 +93,7 @@ public class Player {
 		else {
 			v = Integer.MAX_VALUE;
 			for (GameState child : mu(state)) {
-				v = min(v, alphabeta(child, depth-1, alpha, beta, Constants.CELL_X));
+				v = min(v, alphabeta(child, depth-1, alpha, beta, opponent(player)));
 				beta = min(beta, v);
 				if (beta <= alpha)
 					break; // alpha prune
