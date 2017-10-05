@@ -117,8 +117,8 @@ public class Player {
 
 	private int gamma(GameState state, int player, GameState prevState) {
 
-		if (state.isOWin()) return Integer.MIN_VALUE;
-		if (state.isXWin()) return Integer.MAX_VALUE;
+		if (state.isOWin()) return player == Constants.CELL_X ? Integer.MIN_VALUE : Integer.MAX_VALUE; //Integer.MIN_VALUE;
+		if (state.isXWin()) return player == Constants.CELL_X ? Integer.MAX_VALUE : Integer.MIN_VALUE; //Integer.MAX_VALUE;
 		if (state.isEOG()) return 0;
 
 		int myMarks = 0;
