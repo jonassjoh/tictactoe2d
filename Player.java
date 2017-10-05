@@ -29,7 +29,7 @@ public class Player {
 		GameState bestState = null;
 
 		for (GameState state : nextStates) {
-			int alpha = alphabeta(state, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer());
+			int alpha = alphabeta(state, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer());
 			//int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, opponent(gameState.getNextPlayer()));
 
 			if (bestAlpha < alpha) {
@@ -119,34 +119,45 @@ public class Player {
 		return myMarks;
 	}
 
+	private int mathit(int points) {
+		int res = 10;
+		while (points > 0) {
+			res *= 10;
+			points--;
+		}
+		return res;
+	}
+
 	private int gamma_rows(GameState state, int player) {
-		int points = 0;
+		int res = 0;
 		for (int row = 0; row < 4; row++) {
+			int points = 0;
 			for (int col = 0; col < 4; col++) {
 				if (state.at(row, col) == opponent(player))
 					return 0;
 				if (state.at(row, col) == player) {
 					points++;
-					points *= points;
 				}
 			}
+			res += mathit(points);
 		}
-		return points;
+		return res;
 	}
 
 	private int gamma_cols(GameState state, int player) {
-		int points = 0;
+		int res = 0;
 		for (int col = 0; col < 4; col++) {
+			int points = 0;
 			for (int row = 0; row < 4; row++) {
 				if (state.at(row, col) == opponent(player))
 					return 0;
 				if (state.at(row, col) == player) {
 					points++;
-					points *= points;
 				}
 			}
+			res += mathit(points);
 		}
-		return points;
+		return res;
 	}
 
 	private int gamma_cross(GameState state, int player) {
@@ -156,10 +167,9 @@ public class Player {
 				return 0;
 			if (state.at(i, i) == player) {
 				points++;
-				points *= points;
 			}
 		}
-		return points;
+		return mathit(points);
 	}
 
 	private int gamma_cross_opposite(GameState state, int player) {
@@ -169,10 +179,9 @@ public class Player {
 				return 0;
 			if (state.at(i, 4-i) == player) {
 				points++;
-				points *= points;
 			}
 		}
-		return points;
+		return mathit(points);
 	}
 
 	private int opponent(int player) {

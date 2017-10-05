@@ -6,7 +6,7 @@ import java.util.Vector;
  *
  * Cells are numbered as follows:
  *
- *    col 0  1  2  3  
+ *    col 0  1  2  3
  * row  ---------------
  *  0  |  0  1  2  3  |  0
  *  1  |  4  5  6  7  |  1
@@ -14,11 +14,11 @@ import java.util.Vector;
  *  3  | 12  13 14 15 |  3
  *      ---------------
  *        0  1  2  3
- 
+
  *
  * The staring board looks like this:
  *
- *    col 0  1  2  3  
+ *    col 0  1  2  3
  * row  ---------------
  *  0  |  .  .  .  .  |  0
  *  1  |  .  .  .  .  |  1
@@ -26,7 +26,7 @@ import java.util.Vector;
  *  3  |  .  .  .  .  |  3
  *      ---------------
  *        0  1  2  3
- * 
+ *
  * X moves first.
  */
 
@@ -68,13 +68,14 @@ public class GameState {
       String board, last_move, next_player;
       board = st.nextToken();
       last_move = st.nextToken();
+      System.err.println(last_move);
       next_player = st.nextToken();
 
       /* Sanity checks. If any of these fail, something has gone horribly
        * wrong. */
       assert(board.length() == GameState.CELL_COUNT);
       assert(next_player.length() == 1);
-      
+
       // Parse the board
       for (int i = 0; i < GameState.CELL_COUNT; ++i) {
         if (board.charAt(i) == Constants.MESSAGE_SYMBOLS[Constants.CELL_EMPTY]) {
@@ -110,7 +111,7 @@ public class GameState {
     }
 
     /**
-     * Constructs a board which is the result of applying move move to board 
+     * Constructs a board which is the result of applying move move to board
      * gameState.
      *
      * @param gameState the starting board position
@@ -153,7 +154,7 @@ public class GameState {
     /**
      * Gets the row corresponding to an index in the array representation of
      * the board.
-     * 
+     *
      * @param cell
      * @return the row corresponding to a cell index
      */
@@ -164,7 +165,7 @@ public class GameState {
     /**
      * Gets the column corresponding to an index in the array representation of
      * the board.
-     * 
+     *
      * @param cell
      * @return the column corresponding to a cell index
      */
@@ -175,7 +176,7 @@ public class GameState {
     /**
      * Gets the index in the array representation of the board given column,
      * row and layer indexes.
-     * 
+     *
      * @param row
      * @param column
      * @return cell index corresponding to the row and column indexes
@@ -221,13 +222,13 @@ public class GameState {
       assert(pos < CELL_COUNT);
       return cells[pos];
     }
-    
+
     private void set(int pos, int cell) {
       assert(pos >= 0);
       assert(pos < CELL_COUNT);
       cells[pos] = cell;
     }
-    
+
     /**
      * Gets the last move made (the move that led to the current state).
      */
@@ -293,7 +294,7 @@ public class GameState {
              return LINE_DRAW;
          }
        }
-       
+
        return ((playerCells == BOARD_SIZE) ? LINE_WIN : LINE_NONE);
     }
 
@@ -332,9 +333,9 @@ public class GameState {
             moves.add(new Move(cell, Constants.CELL_X, specialMove));
           }
           else {
-            moves.add(new Move(cell, Constants.CELL_X)); 
+            moves.add(new Move(cell, Constants.CELL_X));
           }
-        }                   
+        }
       }
       // Try move O
       if (this.nextPlayer == Constants.CELL_O) {
@@ -346,7 +347,7 @@ public class GameState {
             moves.add(new Move(cell, Constants.CELL_O, specialMove));
           }
           else {
-            moves.add(new Move(cell, Constants.CELL_O)); 
+            moves.add(new Move(cell, Constants.CELL_O));
           }
         }
       }
@@ -366,12 +367,12 @@ public class GameState {
       }
 
       Vector<Move> moves = new Vector<Move>();
-      
+
       for (int k = 0; k < CELL_COUNT; ++k)
       {
-        tryMove(moves, k);        
+        tryMove(moves, k);
       }
-      
+
       // Convert moves to GameStates
       for (int i = 0; i < moves.size(); ++i) {
         states.add(new GameState(this, moves.elementAt(i)));
@@ -383,13 +384,13 @@ public class GameState {
      *
      * Note: This doesn't check that the move is valid, so you should only use
      * it with moves returned by findPossibleMoves.
-     * 
+     *
      * @param move the move to perform
      */
     public void doMove(final Move move) {
       // Set the cell
       set(move.at(0), move.at(1));
-     
+
       // Remember last move
       lastMove = move;
 
@@ -399,7 +400,7 @@ public class GameState {
 
     /**
      * Compares two game states.
-     * 
+     *
      * @param gameState game state to compare to
      * @return true if game states are identical, otherwise false
      */
@@ -437,7 +438,7 @@ public class GameState {
       boolean is_my_turn = (nextPlayer == player);
       int X_pieces = 0;
       int O_pieces = 0;
-      
+
       for (int i = 0; i < CELL_COUNT; ++i) {
         if ((at(i) & Constants.CELL_X) != 0)
           ++X_pieces;
@@ -456,27 +457,27 @@ public class GameState {
       }
       ss.append(board_right + " 3 ");
       ss.append("  Last move: " + lastMove.toString() + (is_winner ? " (WOHO! I WON!)\n" : "\n"));
-      
+
       ss.append("  4 " + board_left);
       for(int c = 0; c < BOARD_SIZE; c++) {
         ss.append(cell_text[this.at(1, c)]);
       }
       ss.append(board_right + " 7 ");
       ss.append("  Next player: " + cell_text[nextPlayer] + (is_my_turn ? " (My turn)\n" : " (Opponents turn)\n"));
-      
+
       ss.append("  8 " + board_left);
       for(int c = 0; c < BOARD_SIZE; c++) {
           ss.append(cell_text[this.at(2, c)]);
       }
       ss.append(board_right + " 11");
-      ss.append("  X pieces: " + String.valueOf(X_pieces) + "\n");    
+      ss.append("  X pieces: " + String.valueOf(X_pieces) + "\n");
 
       ss.append(" 12 " + board_left);
       for(int c = 0; c < BOARD_SIZE; c++) {
           ss.append(cell_text[this.at(3, c)]);
       }
       ss.append(board_right + " 15");
-      ss.append("  O pieces: " + String.valueOf(O_pieces) + "\n"); 
+      ss.append("  O pieces: " + String.valueOf(O_pieces) + "\n");
       ss.append(board_bottom);
 
       return ss.toString();
