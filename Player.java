@@ -24,24 +24,33 @@ public class Player {
 		 * Here you should write your algorithms to get the best next move, i.e.
 		 * the best next state. This skeleton returns a random move instead.
 		 */
-   
+
+		int bestAlpha = Integer.MIN_VALUE;
+		GameState bestState = null;
+
 		for (GameState state : nextStates) {
+			int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer());
+
+			if (bestAlpha < alpha) {
+				bestAlpha = alpha;
+				bestState = state;
+			}
 		}
 
-
-		Random random = new Random();
-		return nextStates.elementAt(random.nextInt(nextStates.size()));
+		return bestState;
+		//Random random = new Random();
+		//return nextStates.elementAt(random.nextInt(nextStates.size()));
 	}
-	
+
 	private int minimax(GameState state, int player) {
-		
+
 		if (mu(state).size() == 0) {
 			return gamma(state, player);
 		}
 
 
 		boolean player_A = (player == Constants.CELL_X);
-		
+
 		int bestPossible = player_A ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
 		for (GameState child : mu(state)) {
@@ -67,7 +76,7 @@ public class Player {
 		if (depth == 0 || mu(state).size() == 0) {
 			return gamma(state, player);
 		}
-	
+
 		boolean player_A = (player == Constants.CELL_X);
 		int v = 0;
 
@@ -99,15 +108,74 @@ public class Player {
 	}
 
 	private int gamma(GameState state, int player) {
-		// TOOD: Heuristic function
+		int myMarks = 0;
 
-		
+		myMarks += gamma_rows(state, player);
+		myMarks += gamma_cols(state, player);
+		myMarks += gamma_cross(state, player);
+		myMarks += gamma_cross_opposite(state, player);
 
-		return 1;
+		return myMarks;
 	}
 
-	private void w(GameState state) {
-		
+	private int gamma_rows(GameState state, int player) {
+		int points = 0;
+		for (int row = 0; row < 4; row++) {
+			for (int col = 0; col < 4; col++) {
+				if (state.at(row, col) == opponent(player))
+					return 0;
+				if (state.at(row, col) == player) {
+					points++;
+					points *= points;
+				}
+			}
+		}
+		return points;
+	}
+
+	private int gamma_cols(GameState state, int player) {
+		int points = 0;
+		for (int col = 0; col < 4; col++) {
+			for (int row = 0; row < 4; row++) {
+				if (state.at(row, col) == opponent(player))
+					return 0;
+				if (state.at(row, col) == player) {
+					points++;
+					points *= points;
+				}
+			}
+		}
+		return points;
+	}
+
+	private int gamma_cross(GameState state, int player) {
+		int points = 0;
+		for (int i = 0; i < 4; i++) {
+			if (state.at(i, i) == opponent(player))
+				return 0;
+			if (state.at(i, i) == player) {
+				points++;
+				points *= points;
+			}
+		}
+		return points;
+	}
+
+	private int gamma_cross_opposite(GameState state, int player) {
+		int points = 0;
+		for (int i = 0; i < 4; i++) {
+			if (state.at(i, 4-i) == opponent(player))
+				return 0;
+			if (state.at(i, 4-i) == player) {
+				points++;
+				points *= points;
+			}
+		}
+		return points;
+	}
+
+	private int opponent(int player) {
+		return player == Constants.CELL_X ? Constants.CELL_O : Constants.CELL_X;
 	}
 
 	private int min(int a, int b) {
