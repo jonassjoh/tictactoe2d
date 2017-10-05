@@ -29,7 +29,7 @@ public class Player {
 		GameState bestState = null;
 
 		for (GameState state : nextStates) {
-			int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer());
+			int alpha = alphabeta(state, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer());
 			//int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, opponent(gameState.getNextPlayer()));
 
 			if (bestAlpha < alpha) {
