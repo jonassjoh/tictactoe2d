@@ -33,22 +33,19 @@ public class Player {
 		return nextStates.elementAt(random.nextInt(nextStates.size()));
 	}
 	
-	private int minimax(GameState state) {
-		int player = 0;
-		int PLAYER_A = 0;
-		int PLAYER_B = 1;
+	private int minimax(GameState state, int player) {
 		
 		if (mu(state).size() == 0) {
-			return gamma(state);
+			return gamma(state, player);
 		}
 
 
-		boolean player_A = (state.getNextPlayer() == Constants.CELL_X);
+		boolean player_A = (player == Constants.CELL_X);
 		
 		int bestPossible = player_A ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
 		for (GameState child : mu(state)) {
-			int v = minimax(state);
+			int v = minimax(state, player_A ? Constants.CELL_X : Constants.CELL_O);
 			bestPossible = player_A ? max(bestPossible, v) : min(bestPossible, v);
 		}
 
@@ -65,19 +62,19 @@ public class Player {
 	  * @return
 	  *		The minimax value of the state
 	  */
-	private int alphabeta(GameState state, int depth, int alpha, int beta) {
+	private int alphabeta(GameState state, int depth, int alpha, int beta, int player) {
 
 		if (depth == 0 || mu(state).size() == 0) {
-			return gamma(state);
+			return gamma(state, player);
 		}
 	
-		boolean player_A = (state.getNextPlayer() == Constants.CELL_X);
+		boolean player_A = (player == Constants.CELL_X);
 		int v = 0;
 
 		if (player_A) {
 			v = Integer.MIN_VALUE;
 			for (GameState child : mu(state)) {
-				v = max(v, alphabeta(child, depth-1, alpha, beta));
+				v = max(v, alphabeta(child, depth-1, alpha, beta, Constants.CELL_O));
 				alpha = max(alpha, v);
 				if (beta <= alpha)
 					break; // beta prune
@@ -86,7 +83,7 @@ public class Player {
 		else {
 			v = Integer.MAX_VALUE;
 			for (GameState child : mu(state)) {
-				v = min(v, alphabeta(child, depth-1, alpha, beta));
+				v = min(v, alphabeta(child, depth-1, alpha, beta, Constants.CELL_X));
 				beta = min(beta, v);
 				if (beta <= alpha)
 					break; // alpha prune
@@ -101,9 +98,16 @@ public class Player {
 		return nextStates;
 	}
 
-	private int gamma(GameState state) {
+	private int gamma(GameState state, int player) {
 		// TOOD: Heuristic function
+
+		
+
 		return 1;
+	}
+
+	private void w(GameState state) {
+		
 	}
 
 	private int min(int a, int b) {
