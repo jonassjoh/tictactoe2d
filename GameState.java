@@ -68,7 +68,6 @@ public class GameState {
       String board, last_move, next_player;
       board = st.nextToken();
       last_move = st.nextToken();
-      System.err.println(last_move);
       next_player = st.nextToken();
 
       /* Sanity checks. If any of these fail, something has gone horribly

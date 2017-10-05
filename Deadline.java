@@ -7,7 +7,7 @@ import java.lang.management.ThreadMXBean;
 public class Deadline {
   private long deadline;
 
-  /** 
+  /**
    * Gets CPU time in nanoseconds (but likely with millisecond or microsecond
    * precision).
    */
@@ -16,10 +16,10 @@ public class Deadline {
     return bean.isCurrentThreadCpuTimeSupported() ?
         bean.getCurrentThreadCpuTime() : 0;
   }
-  
+
   /**
    * Constructs and sets the Deadline.
-   * 
+   *
    * @param deadline the deadline expressed in nanoseconds.
    */
   public Deadline(long deadline) {

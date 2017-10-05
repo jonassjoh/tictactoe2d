@@ -29,20 +29,19 @@ public class Player {
 		GameState bestState = null;
 
 		for (GameState state : nextStates) {
-			int alpha = alphabeta(state, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer());
-			//int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, opponent(gameState.getNextPlayer()));
+			int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer(), gameState);
 
 			if (bestAlpha < alpha) {
 				bestAlpha = alpha;
 				bestState = state;
+				gamma(state, gameState.getNextPlayer(), gameState);
 			}
 		}
 
 		return bestState;
-		//Random random = new Random();
-		//return nextStates.elementAt(random.nextInt(nextStates.size()));
 	}
 
+/*
 	private int minimax(GameState state, int player) {
 
 		if (mu(state).size() == 0) {
@@ -61,6 +60,7 @@ public class Player {
 
 		return bestPossible;
 	}
+*/
 
 	/**
 	  * @param state
@@ -72,10 +72,10 @@ public class Player {
 	  * @return
 	  *		The minimax value of the state
 	  */
-	private int alphabeta(GameState state, int depth, int alpha, int beta, int player) {
+	private int alphabeta(GameState state, int depth, int alpha, int beta, int player, GameState prevState) {
 
 		if (depth == 0 || mu(state).size() == 0) {
-			return gamma(state, player);
+			return gamma(state, player, prevState);
 		}
 
 		boolean player_A = (player == Constants.CELL_X);
@@ -84,7 +84,7 @@ public class Player {
 		if (player_A) {
 			v = Integer.MIN_VALUE;
 			for (GameState child : mu(state)) {
-				v = max(v, alphabeta(child, depth-1, alpha, beta, opponent(player)));
+				v = max(v, alphabeta(child, depth-1, alpha, beta, opponent(player), state));
 				alpha = max(alpha, v);
 				if (beta <= alpha)
 					break; // beta prune
@@ -93,7 +93,7 @@ public class Player {
 		else {
 			v = Integer.MAX_VALUE;
 			for (GameState child : mu(state)) {
-				v = min(v, alphabeta(child, depth-1, alpha, beta, opponent(player)));
+				v = min(v, alphabeta(child, depth-1, alpha, beta, opponent(player), state));
 				beta = min(beta, v);
 				if (beta <= alpha)
 					break; // alpha prune
@@ -108,19 +108,33 @@ public class Player {
 		return nextStates;
 	}
 
-	private int gamma(GameState state, int player) {
+	private int getPlayedCell(GameState curr, GameState prev) {
+		for (int cell=0; cell < 16; cell++) {
+			if (prev.at(cell) != curr.at(cell)) return cell;
+		}
+		return -1;
+	}
+
+	private int gamma(GameState state, int player, GameState prevState) {
+
+		if (state.isOWin()) return Integer.MIN_VALUE;
+		if (state.isXWin()) return Integer.MAX_VALUE;
+		if (state.isEOG()) return 0;
+
 		int myMarks = 0;
 
-		myMarks += gamma_rows(state, player);
-		myMarks += gamma_cols(state, player);
-		myMarks += gamma_cross(state, player);
-		myMarks += gamma_cross_opposite(state, player);
+		int cell = getPlayedCell(state, prevState);
 
-		return myMarks;
+		myMarks += gamma_rows(state, player, cell);
+		myMarks += gamma_cols(state, player, cell);
+		myMarks += gamma_cross(state, player, cell);
+		myMarks += gamma_cross_opposite(state, player, cell);
+
+		return player == Constants.CELL_X ? myMarks : myMarks * -1;
 	}
 
 	private int mathit(int points) {
-		int res = 10;
+		int res = 1;
 		while (points > 0) {
 			res *= 10;
 			points--;
@@ -128,39 +142,66 @@ public class Player {
 		return res;
 	}
 
-	private int gamma_rows(GameState state, int player) {
-		int res = 0;
+	private int gamma_rows(GameState state, int player, int cell) {
+		int col = state.cellToCol(cell);
+
+		int points = 0;
 		for (int row = 0; row < 4; row++) {
-			int points = 0;
-			for (int col = 0; col < 4; col++) {
-				if (state.at(row, col) == opponent(player))
-					return 0;
-				if (state.at(row, col) == player) {
-					points++;
-				}
-			}
-			res += mathit(points);
+			if (state.at(row, col) == opponent(player))
+				return 0;
+			if (state.at(row, col) == player)
+				points++;
 		}
-		return res;
+		return mathit(points);
 	}
 
-	private int gamma_cols(GameState state, int player) {
-		int res = 0;
+	private int gamma_cols(GameState state, int player, int cell) {
+		int row = state.cellToRow(cell);
+
+		int points = 0;
 		for (int col = 0; col < 4; col++) {
-			int points = 0;
-			for (int row = 0; row < 4; row++) {
-				if (state.at(row, col) == opponent(player))
-					return 0;
-				if (state.at(row, col) == player) {
-					points++;
-				}
-			}
-			res += mathit(points);
+			if (state.at(row, col) == opponent(player))
+				return 0;
+			if (state.at(row, col) == player)
+				points++;
 		}
-		return res;
+		return mathit(points);
 	}
 
-	private int gamma_cross(GameState state, int player) {
+	private boolean inCross_1(GameState state, int cell) {
+		switch (cell) {
+			case 0:
+				return true;
+			case 5:
+				return true;
+			case 10:
+				return true;
+			case 15:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private boolean inCross_2(GameState state, int cell) {
+		switch (cell) {
+			case 3:
+				return true;
+			case 6:
+				return true;
+			case 9:
+				return true;
+			case 12:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private int gamma_cross(GameState state, int player, int cell) {
+
+		if (!inCross_1(state, cell)) return 0;
+
 		int points = 0;
 		for (int i = 0; i < 4; i++) {
 			if (state.at(i, i) == opponent(player))
@@ -172,12 +213,15 @@ public class Player {
 		return mathit(points);
 	}
 
-	private int gamma_cross_opposite(GameState state, int player) {
+	private int gamma_cross_opposite(GameState state, int player, int cell) {
+
+		if (!inCross_2(state, cell)) return 0;
+
 		int points = 0;
 		for (int i = 0; i < 4; i++) {
-			if (state.at(i, 4-i) == opponent(player))
+			if (state.at(i, 3-i) == opponent(player))
 				return 0;
-			if (state.at(i, 4-i) == player) {
+			if (state.at(i, 3-i) == player) {
 				points++;
 			}
 		}
