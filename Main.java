@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 
 /**
  * Starts the game for one client.
- * 
+ *
  * Note:
  *      Use the verbose flag for outputting game information.
  *      Use the fast flag for using 100ms move deadline instead of 1000ms.
@@ -54,7 +54,7 @@ public class Main {
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
       while ((input_message = br.readLine()) != null) {
         /* Deadline is one second from when we receive the message */
-        Deadline deadline = new Deadline(Deadline.getCpuTime() + (fast ? (long) 1e8 : (long) 1e9));
+        Deadline deadline = new Deadline(Deadline.getCpuTime() + (fast ? (long) 1e8 : (long) 1e11));
 
         /* Get game state from standard input */
         GameState input_state = new GameState(input_message);
@@ -109,7 +109,7 @@ public class Main {
 
         /* Send the next move */
         String output_message = output_state.toMessage();
-        
+
         System.out.println(output_message);
 
         /* Quit if this is the end of the game */

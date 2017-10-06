@@ -25,42 +25,24 @@ public class Player {
 		 * the best next state. This skeleton returns a random move instead.
 		 */
 
-		int bestAlpha = Integer.MIN_VALUE;
-		GameState bestState = null;
+		 final int MAX_DEPTH = 2;
 
-		for (GameState state : nextStates) {
-			int alpha = alphabeta(state, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer(), gameState);
+		 int bestAlpha = Integer.MIN_VALUE;
+		 GameState bestState = null;
+		 for (int depth = 0; depth <= MAX_DEPTH; depth++) {
 
-			if (bestAlpha < alpha) {
-				bestAlpha = alpha;
-				bestState = state;
-				gamma(state, gameState.getNextPlayer(), gameState);
+			for (GameState state : nextStates) {
+				int alpha = alphabeta(state, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, gameState.getNextPlayer(), gameState);
+
+				if (bestAlpha <= alpha) {
+					bestAlpha = alpha;
+					bestState = state;
+				}
 			}
 		}
 
 		return bestState;
 	}
-
-/*
-	private int minimax(GameState state, int player) {
-
-		if (mu(state).size() == 0) {
-			return gamma(state, player);
-		}
-
-
-		boolean player_A = (player == Constants.CELL_X);
-
-		int bestPossible = player_A ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-
-		for (GameState child : mu(state)) {
-			int v = minimax(state, player_A ? Constants.CELL_X : Constants.CELL_O);
-			bestPossible = player_A ? max(bestPossible, v) : min(bestPossible, v);
-		}
-
-		return bestPossible;
-	}
-*/
 
 	/**
 	  * @param state
@@ -75,7 +57,11 @@ public class Player {
 	private int alphabeta(GameState state, int depth, int alpha, int beta, int player, GameState prevState) {
 
 		if (depth == 0 || mu(state).size() == 0) {
-			return gamma(state, player, prevState);
+			int g = gamma(state, player, prevState);
+			if (mu(state).size() == 0) {
+				//System.err.println(getPlayedCell(state, prevState) + " - " + depth + " - " + g);
+			}
+			return g;
 		}
 
 		boolean player_A = (player == Constants.CELL_X);
@@ -117,8 +103,8 @@ public class Player {
 
 	private int gamma(GameState state, int player, GameState prevState) {
 
-		if (state.isOWin()) return player == Constants.CELL_X ? Integer.MIN_VALUE : Integer.MAX_VALUE; //Integer.MIN_VALUE;
-		if (state.isXWin()) return player == Constants.CELL_X ? Integer.MAX_VALUE : Integer.MIN_VALUE; //Integer.MAX_VALUE;
+		if (state.isOWin()) return Integer.MIN_VALUE;
+		if (state.isXWin()) return Integer.MAX_VALUE;
 		if (state.isEOG()) return 0;
 
 		int myMarks = 0;
